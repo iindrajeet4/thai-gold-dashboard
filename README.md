@@ -1,11 +1,12 @@
 # Thai Gold Dashboard 🪙
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Live Demo](https://img.shields.io/badge/demo-live-blue.svg)](https://iindrajeet4.github.io/thai-gold-dashboard/) [![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](#)
+
 ราคาทองคำแท่ง–ทองรูปพรรณแบบสด อ้างอิง**สมาคมค้าทองคำ (Gold Traders Association)** พร้อมเครื่องคำนวณราคาขายเครื่องประดับ (เนื้อทอง + ค่ากำเหน็จ) และประเมินราคารับซื้อคืน — ทั้งหมดใน **ไฟล์ HTML เดียว ไม่ต้อง build ไม่ต้องมี server ไม่มี dependency ภายนอก**
 
 Live Thai gold price dashboard (gold bar & ornament, buy/sell) with a jewelry price calculator and buy-back estimator — single-file, zero-dependency, client-side only.
 
-![Screenshot](docs/screenshot.png)
-<!-- TODO: add docs/screenshot.png before publishing -->
+**[🔗 Live Demo / ลองใช้เลย](https://iindrajeet4.github.io/thai-gold-dashboard/)**
 
 ## ✨ Features
 
@@ -26,7 +27,7 @@ Live Thai gold price dashboard (gold bar & ornament, buy/sell) with a jewelry pr
 
 ## 🚀 Usage
 
-1. ดาวน์โหลดหรือ clone repo นี้
+1. ใช้งานได้ทันทีที่ **https://iindrajeet4.github.io/thai-gold-dashboard/** — หรือดาวน์โหลด/clone repo นี้
 2. เปิด `index.html` ในเบราว์เซอร์ได้เลย — หรือ deploy ขึ้น GitHub Pages / static host ใดก็ได้
 3. กด **⟳ อัปเดตราคา** เพื่อดึงราคาล่าสุด (ต้องต่ออินเทอร์เน็ต; ถ้าไม่ได้จะใช้ราคาแคชหรือกรอกเอง)
 
