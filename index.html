@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ราคาทองคำแท่ง–รูปพรรณวันนี้ อ้างอิงสมาคมค้าทองคำ พร้อมเครื่องคำนวณราคาเครื่องประดับและประเมินราคารับซื้อคืน">
-<title>Thai Gold Dashboard — ราคาทองวันนี้ + คำนวณราคาเครื่องประดับ</title>
+<meta name="description" content="ราคาทองคำแท่ง–รูปพรรณวันนี้ อ้างอิงสมาคมค้าทองคำ พร้อมกราฟราคาย้อนหลัง เครื่องคำนวณราคาเครื่องประดับ และคู่มือ+ประเมินราคาเพชร 4Cs">
+<title>Thai Gold Dashboard — ราคาทองวันนี้ + คำนวณราคาเครื่องประดับ + คู่มือเพชร</title>
 <style>
 :root{
   --bg:#0c0e12; --panel:#14171d; --panel2:#1b1f27; --border:#272c37;
@@ -30,6 +30,10 @@ button:hover{border-color:var(--gold)}
 button:active{transform:scale(.97)}
 button.gold{background:linear-gradient(135deg,#e6b64c,#c99a2e);border:none;color:#1a1405;font-weight:700}
 button:disabled{opacity:.55;cursor:wait}
+.tabs{display:flex;gap:8px;max-width:1200px;margin:0 auto;padding:16px 16px 0}
+@media(min-width:700px){.tabs{padding:20px 26px 0}}
+.tabs button{flex:0 0 auto;padding:9px 22px;border-radius:11px;font-weight:600}
+.tabs button.active{background:linear-gradient(135deg,#e6b64c,#c99a2e);border-color:transparent;color:#1a1405}
 main{max-width:1200px;margin:0 auto;padding:18px 16px 24px;display:grid;gap:18px}
 @media(min-width:700px){main{padding:24px 26px}}
 .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -48,7 +52,8 @@ main{max-width:1200px;margin:0 auto;padding:18px 16px 24px;display:grid;gap:18px
 .grid2{display:grid;grid-template-columns:1fr;gap:18px}
 @media(min-width:860px){.grid2{grid-template-columns:1fr 1fr;gap:20px}}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-.panel h2{font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.panel h2{font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.panel h3{font-size:14px;margin:14px 0 6px;color:var(--gold2)}
 .field{margin-bottom:14px;min-width:0}
 .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
 input,select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:10px 12px;font:inherit;min-height:42px}
@@ -60,12 +65,28 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .result .total{border-top:1px solid var(--border);margin-top:8px;padding-top:10px;font-size:20px;font-weight:700;display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
 .result .total span:last-child{color:var(--gold2)}
 .result .warn{color:var(--down);font-size:13px;padding:4px 0}
-#chart{width:100%;height:180px;display:block}
+#chart{width:100%;height:200px;display:block}
+.range{display:flex;gap:6px;margin-left:auto}
+.range button{min-height:30px;padding:3px 12px;font-size:12.5px;border-radius:8px}
+.range button.active{border-color:var(--gold);color:var(--gold2)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.legend .k{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 16px;border-top:1px solid var(--border);margin-top:10px}
 footer a{color:var(--gold)}
 .manual-box{display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
 .errbar{display:none;background:rgba(255,92,114,.1);border:1px solid rgba(255,92,114,.4);color:var(--down);border-radius:11px;padding:10px 16px;font-size:13px}
+.note{background:rgba(230,182,76,.09);border:1px solid rgba(230,182,76,.35);border-radius:11px;padding:12px 16px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.tablewrap{overflow-x:auto}
+details{border:1px solid var(--border);border-radius:11px;padding:12px 16px;margin-bottom:10px;background:var(--panel2)}
+details summary{cursor:pointer;font-weight:600;font-size:14px}
+details p,details ul{font-size:13.5px;margin-top:8px;color:var(--text)}
+details ul{padding-left:20px}
+.tab-page{display:none}
+.tab-page.active{display:grid;gap:18px}
 </style>
 </head>
 <body>
@@ -73,7 +94,7 @@ footer a{color:var(--gold)}
   <div class="logo">🪙</div>
   <div>
     <h1>Thai Gold Dashboard</h1>
-    <div class="sub">ราคาทองคำแท่ง–รูปพรรณ อ้างอิงสมาคมค้าทองคำ + เครื่องคำนวณราคาเครื่องประดับ</div>
+    <div class="sub">ราคาทองคำแท่ง–รูปพรรณ อ้างอิงสมาคมค้าทองคำ · เครื่องคำนวณ · คู่มือเพชร 4Cs</div>
   </div>
   <div class="spacer"></div>
   <span class="badge" id="srcBadge">…</span>
@@ -81,7 +102,13 @@ footer a{color:var(--gold)}
   <button class="gold" id="btnRefresh">⟳ อัปเดตราคา</button>
 </header>
 
+<nav class="tabs" role="tablist">
+  <button id="tabGold" class="active" role="tab" aria-selected="true">🪙 ทองคำ</button>
+  <button id="tabDia" role="tab" aria-selected="false">💎 เพชร</button>
+</nav>
+
 <main>
+<div class="tab-page active" id="pageGold">
   <div class="errbar" id="errBar"></div>
 
   <div class="cards">
@@ -105,9 +132,19 @@ footer a{color:var(--gold)}
   </div>
 
   <div class="panel">
-    <h2>📈 ราคาที่บันทึกไว้ (จากการเปิดใช้แต่ละครั้ง)</h2>
-    <svg id="chart" preserveAspectRatio="none" role="img" aria-label="กราฟราคาทองแท่งขายออกย้อนหลัง"></svg>
-    <div class="hint">กราฟสะสมจากราคาทองแท่งขายออกทุกครั้งที่เปิดหน้านี้ — เก็บในเครื่องคุณเท่านั้น (localStorage)</div>
+    <h2>📈 กราฟราคาย้อนหลัง
+      <span class="range" id="rangeBtns">
+        <button data-days="30">30 วัน</button>
+        <button data-days="90" class="active">90 วัน</button>
+        <button data-days="365">1 ปี</button>
+      </span>
+    </h2>
+    <svg id="chart" preserveAspectRatio="none" role="img" aria-label="กราฟราคาทองย้อนหลัง"></svg>
+    <div class="legend">
+      <span><span class="k" style="background:var(--gold)"></span>ราคาอ้างอิงตลาดโลก (PAXG แปลงเป็น ฿/บาททอง)</span>
+      <span><span class="k" style="background:var(--up)"></span>ราคาสมาคมฯ ที่บันทึกในเครื่อง</span>
+    </div>
+    <div class="hint" id="chartHint">เส้นสีทอง = ราคาทองตลาดโลกจากโทเคน PAX Gold (PAXG ≈ ทอง 99.99% 1 ออนซ์) แปลงเป็นบาทต่อบาททอง (96.5%) โดยประมาณ — เป็น <b>ราคาอ้างอิง</b> อาจต่างจากราคาประกาศสมาคมค้าทองคำเล็กน้อย · เส้นสีเขียว = ราคาสมาคมฯ ที่เครื่องคุณบันทึกไว้แต่ละวันที่เปิดใช้</div>
   </div>
 
   <div class="grid2">
@@ -179,12 +216,147 @@ footer a{color:var(--gold)}
       </div>
     </div>
   </div>
+</div><!-- /pageGold -->
+
+<div class="tab-page" id="pageDia">
+  <div class="note">💎 <b>หมายเหตุสำคัญ:</b> ไม่มี API ราคาเพชรแบบเรียลไทม์ที่เปิดฟรี (ราคากลาง Rapaport เป็นบริการเสียเงิน) ตัวประเมินนี้ใช้ <b>ราคากลางโดยประมาณจากตลาดค้าปลีกปี 2025–2026</b> เป็นเพียง <b>แนวทางคร่าวๆ</b> เท่านั้น — ราคาจริงต่อรองเป็นรายเม็ดตามใบเซอร์ ความสวยของน้ำ ไฟ และสภาพตลาด ช่างทอง/ร้านเพชรสามารถแก้ "ราคาฐานต่อกะรัต" ด้านล่างให้ตรงกับราคาตลาด/Rapaport ปัจจุบันได้เอง</div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>💎 ประเมินราคาเพชร (โดยประมาณ)</h2>
+      <div class="row">
+        <div class="field">
+          <label for="dCarat">น้ำหนัก (กะรัต)</label>
+          <input type="number" id="dCarat" value="1.00" min="0.01" max="10" step="0.01" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="dShape">รูปทรง (Shape)</label>
+          <select id="dShape">
+            <option value="round">กลม (Round Brilliant)</option>
+            <option value="princess">พรินเซส (Princess)</option>
+            <option value="oval">รี (Oval)</option>
+            <option value="emerald">เอเมอรัลด์ (Emerald)</option>
+            <option value="pear">หยดน้ำ (Pear)</option>
+            <option value="marquise">มาร์คีส์ (Marquise)</option>
+            <option value="cushion">คุชชั่น (Cushion)</option>
+            <option value="heart">หัวใจ (Heart)</option>
+            <option value="radiant">เรเดียนท์ (Radiant)</option>
+            <option value="asscher">แอสเชอร์ (Asscher)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="dColor">น้ำ/สี (Color)</label>
+          <select id="dColor">
+            <option value="D">D (ขาวใสสุด 100%)</option>
+            <option value="E">E (99%)</option>
+            <option value="F">F (98%)</option>
+            <option value="G" selected>G (97%)</option>
+            <option value="H">H (96%)</option>
+            <option value="I">I (95%)</option>
+            <option value="J">J (94%)</option>
+            <option value="K">K (93%)</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dClarity">ความสะอาด (Clarity)</label>
+          <select id="dClarity">
+            <option value="FL">FL (ไร้ตำหนิ)</option>
+            <option value="IF">IF</option>
+            <option value="VVS1">VVS1</option>
+            <option value="VVS2">VVS2</option>
+            <option value="VS1" selected>VS1</option>
+            <option value="VS2">VS2</option>
+            <option value="SI1">SI1</option>
+            <option value="SI2">SI2</option>
+            <option value="I1">I1</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dCut">เหลี่ยมเจียระไน (Cut)</label>
+          <select id="dCut">
+            <option value="EX" selected>Excellent / Ideal</option>
+            <option value="VG">Very Good</option>
+            <option value="G">Good</option>
+            <option value="F">Fair</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dBase">ราคาฐาน ฿/กะรัต (เพชรกลม 1.00 ct, น้ำ G, VS1, Cut Excellent) — แก้เพื่อปรับเทียบตลาดได้</label>
+        <input type="number" id="dBase" min="1000" step="1000" inputmode="numeric">
+        <div class="hint">ค่าเริ่มต้น ≈ 230,000 ฿/กะรัต (เทียบ ~US$6,500 ตลาดค้าปลีก 2025–26) · กด "คืนค่าเริ่มต้น" เพื่อรีเซ็ต <button id="dReset" style="min-height:28px;padding:2px 10px;font-size:12px;margin-left:6px">คืนค่าเริ่มต้น</button></div>
+      </div>
+      <div class="result" id="diaResult"></div>
+      <div class="hint" style="margin-top:10px">⚠️ ตัวเลขเป็นช่วงประมาณสำหรับ<b>เพชรแท้ธรรมชาติพร้อมใบเซอร์</b>เท่านั้น ไม่รวมตัวเรือน · เพชรแล็บ (Lab-grown) ราคาต่ำกว่ามาก (มักเหลือ ~5–15% ของเพชรธรรมชาติ) · ไม่ใช่คำแนะนำการลงทุน</div>
+    </div>
+
+    <div>
+      <div class="panel" style="margin-bottom:18px">
+        <h2>📏 ตารางเทียบขนาด (มม.) ↔ กะรัต — เพชรกลม</h2>
+        <div class="tablewrap"><table>
+          <tr><th>เส้นผ่านศูนย์กลาง</th><th>≈ กะรัต</th><th>เส้นผ่านศูนย์กลาง</th><th>≈ กะรัต</th></tr>
+          <tr><td>3.0 mm</td><td>0.10</td><td>6.5 mm</td><td>1.00</td></tr>
+          <tr><td>3.8 mm</td><td>0.20</td><td>7.0 mm</td><td>1.25</td></tr>
+          <tr><td>4.1 mm</td><td>0.25</td><td>7.4 mm</td><td>1.50</td></tr>
+          <tr><td>4.5 mm</td><td>0.33</td><td>7.8 mm</td><td>1.75</td></tr>
+          <tr><td>5.0 mm</td><td>0.50</td><td>8.1 mm</td><td>2.00</td></tr>
+          <tr><td>5.5 mm</td><td>0.66</td><td>8.8 mm</td><td>2.50</td></tr>
+          <tr><td>5.8 mm</td><td>0.75</td><td>9.3 mm</td><td>3.00</td></tr>
+          <tr><td>6.2 mm</td><td>0.90</td><td>10.4 mm</td><td>4.00</td></tr>
+        </table></div>
+        <div class="hint">ค่าโดยประมาณสำหรับเพชรกลมสัดส่วนมาตรฐาน (เจียระไนลึก/ตื้นทำให้ต่างได้)</div>
+      </div>
+
+      <div class="panel">
+        <h2>📜 ใบรับรอง (Certificate)</h2>
+        <p style="font-size:13.5px">เพชรตั้งแต่ ~0.30 กะรัตขึ้นไปควรมีใบเซอร์จากสถาบันที่เชื่อถือได้:</p>
+        <ul style="font-size:13.5px;padding-left:20px;margin-top:6px">
+          <li><b>GIA</b> (Gemological Institute of America) — มาตรฐานสากลที่ยอมรับกว้างที่สุด เกรดเข้มงวด</li>
+          <li><b>HRD</b> (Antwerp) — มาตรฐานยุโรป เข้มงวดใกล้เคียง GIA</li>
+          <li><b>IGI</b> — แพร่หลายในเอเชียและเพชรแล็บ ตรวจเลขเซอร์ได้ออนไลน์</li>
+        </ul>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px">เพชรเม็ดเดียวกันเกรดต่างสถาบันอาจต่างกัน 1 ระดับ — ราคาควรอิงใบเซอร์ที่แนบจริงเสมอ และตรวจเลขใบเซอร์กับฐานข้อมูลของสถาบันก่อนซื้อ</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🎓 รู้จัก 4Cs — หลักสากลในการดูเพชร</h2>
+    <details open>
+      <summary>① Carat (กะรัต — น้ำหนัก)</summary>
+      <p>1 กะรัต = 0.20 กรัม แบ่งเป็น 100 สตางค์ (points) เช่น 0.50 ct = 50 สตางค์ · ราคาต่อกะรัต<b>ไม่เป็นเส้นตรง</b> — เพชร 2 ct แพงกว่าเพชร 1 ct สองเม็ดรวมกันมาก เพราะเม็ดใหญ่หายากกว่า และราคากระโดดที่น้ำหนักเลขกลม (0.50 / 1.00 / 1.50 / 2.00)</p>
+    </details>
+    <details>
+      <summary>② Cut (เหลี่ยมเจียระไน)</summary>
+      <p>สำคัญที่สุดต่อ "ความเป็นประกาย" เพราะกำหนดการสะท้อนแสง เกรด GIA: <b>Excellent → Very Good → Good → Fair → Poor</b> · เพชรน้ำสวยแต่เจียระไนแย่จะดูหมองได้ แนะนำ Excellent/Very Good เสมอ (คำว่า Ideal/Triple Excellent = Cut, Polish, Symmetry ได้ Excellent ทั้งสาม)</p>
+    </details>
+    <details>
+      <summary>③ Color (น้ำ/สี)</summary>
+      <p>ไล่จาก <b>D</b> (ไร้สีสนิท) ถึง <b>Z</b> (เหลืองชัด) · คนไทยนิยมเรียกเป็น "น้ำ": D=100%, E=99%, F=98%, G=97%, H=96%, I=95%, J=94%, K=93% · D–F จัดเป็นไร้สี (Colorless), G–J ใกล้ไร้สี (Near Colorless) ซึ่งเมื่อขึ้นตัวเรือนแล้วตาเปล่าแทบแยกจาก D–F ไม่ออก แต่ราคาถูกกว่า 30–50%</p>
+    </details>
+    <details>
+      <summary>④ Clarity (ความสะอาด)</summary>
+      <ul>
+        <li><b>FL / IF</b> — ไร้ตำหนิ (Flawless / Internally Flawless) หายากและแพงสุด</li>
+        <li><b>VVS1 / VVS2</b> — ตำหนิเล็กมาก มองยากแม้ใช้กล้องขยาย 10 เท่า</li>
+        <li><b>VS1 / VS2</b> — ตำหนิเล็ก เห็นใต้กล้อง 10 เท่า แต่<b>ตาเปล่ามองไม่เห็น</b> — จุดคุ้มค่ายอดนิยม</li>
+        <li><b>SI1 / SI2</b> — เห็นชัดใต้กล้อง บางเม็ดตาเปล่าเริ่มเห็น ควรดูเม็ดจริง</li>
+        <li><b>I1–I3</b> — ตำหนิเห็นด้วยตาเปล่า กระทบความใสและความแข็งแรง</li>
+      </ul>
+    </details>
+  </div>
+</div><!-- /pageDia -->
 </main>
 
 <footer>
-  ข้อมูลราคาอ้างอิงจาก <a href="https://www.goldtraders.or.th" target="_blank" rel="noopener">สมาคมค้าทองคำ (Gold Traders Association)</a>
+  ข้อมูลราคาทองอ้างอิงจาก <a href="https://www.goldtraders.or.th" target="_blank" rel="noopener">สมาคมค้าทองคำ</a>
   ผ่าน <a href="https://www.huasengheng.com" target="_blank" rel="noopener">Hua Seng Heng</a> / <a href="https://github.com/pnx/thai-gold-api" target="_blank" rel="noopener">thai-gold-api</a> ·
-  เพื่อการอ้างอิงเท่านั้น ราคาซื้อขายจริงขึ้นกับร้านค้า · MIT License
+  กราฟย้อนหลังอ้างอิง PAX Gold ผ่าน <a href="https://www.coingecko.com" target="_blank" rel="noopener">CoinGecko</a> ·
+  ราคาเพชรเป็นค่าประมาณเพื่อการอ้างอิงเท่านั้น · MIT License
 </footer>
 
 <script>
@@ -193,12 +365,25 @@ const $=s=>document.querySelector(s);
 const API_HSH="https://apicheckprice.huasengheng.com/api/values/getprice/"; // REF = ราคาอ้างอิงสมาคมฯ, JEWEL = รูปพรรณ
 const API_GTA="https://api.chnwt.dev/thai-gold-api/latest";                 // fallback
 // น้ำหนักมาตรฐาน: ทองแท่ง 1 บาททอง = 15.244 g, ทองรูปพรรณ 1 บาททอง = 15.16 g
-const G_BAR=15.244, G_ORN=15.16;
+const G_BAR=15.244, G_ORN=15.16, OZ=31.1035;
 let P={barSell:0,barBuy:0,ornSell:0,ornBuy:0,when:""};
 
 const root=document.documentElement;
 root.dataset.theme=localStorage.getItem("tg-theme")||"dark";
 $("#btnTheme").onclick=()=>{root.dataset.theme=root.dataset.theme==="dark"?"light":"dark";try{localStorage.setItem("tg-theme",root.dataset.theme);}catch(e){}};
+
+/* ---------- tabs ---------- */
+function showTab(dia){
+  $("#pageGold").classList.toggle("active",!dia);
+  $("#pageDia").classList.toggle("active",dia);
+  $("#tabGold").classList.toggle("active",!dia);
+  $("#tabDia").classList.toggle("active",dia);
+  $("#tabGold").setAttribute("aria-selected",String(!dia));
+  $("#tabDia").setAttribute("aria-selected",String(dia));
+  if(!dia) drawChart(); // redraw — svg width is 0 while hidden
+}
+$("#tabGold").onclick=()=>showTab(false);
+$("#tabDia").onclick=()=>showTab(true);
 
 // fmt: "—" เฉพาะค่าที่ไม่ใช่ตัวเลข; 0 แสดงเป็น 0 (ไม่ใช่ "—")
 const fmt=(n,d=0)=>Number.isFinite(n)?n.toLocaleString("th-TH",{minimumFractionDigits:0,maximumFractionDigits:d}):"—";
@@ -332,7 +517,7 @@ function calc(){
 }
 document.querySelectorAll("#w,#unit,#labor,#qty,#bw,#bunit,#btype").forEach(el=>el.addEventListener("input",calc));
 
-/* ---------- history sparkline ---------- */
+/* ---------- local (association price) history ---------- */
 function loadHist(){try{const h=JSON.parse(localStorage.getItem("tg-hist")||"[]");return Array.isArray(h)?h.filter(x=>x&&Number.isFinite(x.p)&&x.p>0):[];}catch(e){return [];}}
 function saveHistory(price){
   if(!Number.isFinite(price)||price<=0) return;
@@ -340,28 +525,155 @@ function saveHistory(price){
   const today=new Date().toISOString().slice(0,10);
   const last=h[h.length-1];
   if(last&&last.d===today) last.p=price; else h.push({d:today,p:price});
-  try{localStorage.setItem("tg-hist",JSON.stringify(h.slice(-60)));}catch(e){}
+  try{localStorage.setItem("tg-hist",JSON.stringify(h.slice(-400)));}catch(e){}
 }
+
+/* ---------- world-market reference history (PAXG via CoinGecko) ---------- */
+// PAXG = โทเคนทอง 99.99% 1 troy oz → แปลงเป็น ฿/บาททอง (แท่ง 15.244 g): × 15.244/31.1035
+// ค่าประมาณของทอง 96.5% ไทย — ใช้เป็นเส้นอ้างอิงเท่านั้น
+const PAXG_TTL=3600e3; // 1 ชั่วโมง
+let chartDays=parseInt(localStorage.getItem("tg-days"),10)||90;
+if(![30,90,365].includes(chartDays)) chartDays=90;
+let paxgHist=[];      // [{d,p}] converted to ฿/บาททอง
+let paxgStatus="loading"; // loading | ok | fail
+
+function paxgCacheKey(days){return "tg-paxg-"+days;}
+function loadPaxgCache(days){
+  try{
+    const c=JSON.parse(localStorage.getItem(paxgCacheKey(days))||"null");
+    if(c&&Array.isArray(c.h)&&c.h.length>1&&Number.isFinite(c.t)) return c;
+  }catch(e){}
+  return null;
+}
+async function loadPaxg(days){
+  paxgStatus="loading";
+  const cached=loadPaxgCache(days);
+  if(cached&&Date.now()-cached.t<PAXG_TTL){ paxgHist=cached.h; paxgStatus="ok"; return; }
+  try{
+    const j=await fetchJSON(`https://api.coingecko.com/api/v3/coins/pax-gold/market_chart?vs_currency=thb&days=${days}${days>1?"&interval=daily":""}`,12000);
+    const prices=j&&Array.isArray(j.prices)?j.prices:null;
+    if(!prices||prices.length<2) throw new Error("bad payload");
+    const byDay=new Map();
+    for(const pt of prices){
+      if(!Array.isArray(pt)||!Number.isFinite(pt[0])||!Number.isFinite(pt[1])||pt[1]<=0) continue;
+      const d=new Date(pt[0]).toISOString().slice(0,10);
+      byDay.set(d,pt[1]*G_BAR/OZ); // THB/oz → THB/บาททอง
+    }
+    const h=[...byDay.entries()].sort((a,b)=>a[0]<b[0]?-1:1).map(([d,p])=>({d,p:Math.round(p)}));
+    if(h.length<2) throw new Error("empty");
+    paxgHist=h; paxgStatus="ok";
+    try{localStorage.setItem(paxgCacheKey(days),JSON.stringify({t:Date.now(),h}));}catch(e){}
+  }catch(e){
+    if(cached){ paxgHist=cached.h; paxgStatus="ok"; } // แคชเก่า (>1h) ยังดีกว่าไม่มี
+    else { paxgHist=[]; paxgStatus="fail"; }
+  }
+}
+
 function drawChart(){
-  const h=loadHist();
   const svg=$("#chart");
-  if(h.length<2){ svg.removeAttribute("viewBox"); svg.innerHTML=`<text x="10" y="30" fill="var(--muted)" font-size="13">เปิดหน้านี้หลายๆ วัน กราฟจะค่อยๆ สะสมข้อมูลเอง (ตอนนี้มี ${h.length} จุด)</text>`; return; }
-  const W=svg.clientWidth||800, H=180, pad=28;
-  const ps=h.map(x=>x.p), min=Math.min(...ps), max=Math.max(...ps), rng=(max-min)||1;
-  const X=i=>pad+i*(W-pad*2)/(h.length-1);
+  if(!svg.clientWidth) return; // tab hidden
+  const cutoff=new Date(Date.now()-chartDays*864e5).toISOString().slice(0,10);
+  const local=loadHist().filter(x=>x.d>=cutoff);
+  const series=[];
+  if(paxgHist.length>1) series.push({h:paxgHist,color:"var(--gold)",width:2.5,dash:""});
+  if(local.length>1)    series.push({h:local,color:"var(--up)",width:2,dash:"5 4"});
+  const hint=$("#chartHint");
+  if(paxgStatus==="fail"){
+    hint.innerHTML="⚠️ โหลดราคาอ้างอิงตลาดโลก (CoinGecko) ไม่ได้ในขณะนี้ — แสดงเฉพาะราคาสมาคมฯ ที่บันทึกในเครื่องคุณ (เส้นเขียว) · ลองใหม่ภายหลัง";
+  }
+  if(!series.length){
+    svg.removeAttribute("viewBox");
+    svg.innerHTML=`<text x="10" y="30" fill="var(--muted)" font-size="13">${paxgStatus==="loading"?"กำลังโหลดกราฟราคาย้อนหลัง…":"ยังไม่มีข้อมูลกราฟ — ต่ออินเทอร์เน็ตแล้วกดอัปเดตราคา"}</text>`;
+    return;
+  }
+  const W=svg.clientWidth||800, H=200, pad=30;
+  const all=series.flatMap(s=>s.h);
+  const dates=all.map(x=>x.d), d0=dates.reduce((a,b)=>a<b?a:b), d1=dates.reduce((a,b)=>a>b?a:b);
+  const t0=Date.parse(d0), t1=Date.parse(d1), tr=(t1-t0)||1;
+  const ps=all.map(x=>x.p), min=Math.min(...ps), max=Math.max(...ps), rng=(max-min)||1;
+  const X=d=>pad+(Date.parse(d)-t0)/tr*(W-pad*2);
   const Y=p=>H-pad-(p-min)/rng*(H-pad*2);
-  const pts=h.map((x,i)=>`${X(i)},${Y(x.p)}`).join(" ");
+  let out="";
+  for(const s of series){
+    const pts=s.h.map(x=>`${X(x.d).toFixed(1)},${Y(x.p).toFixed(1)}`).join(" ");
+    if(s===series[0]&&!s.dash)
+      out+=`<polygon points="${X(s.h[0].d).toFixed(1)},${H-pad} ${pts} ${X(s.h[s.h.length-1].d).toFixed(1)},${H-pad}" fill="${s.color}" opacity="0.08"/>`;
+    out+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="${s.width}" ${s.dash?`stroke-dasharray="${s.dash}"`:""} stroke-linejoin="round"/>`;
+    const lastPt=s.h[s.h.length-1];
+    out+=`<circle cx="${X(lastPt.d).toFixed(1)}" cy="${Y(lastPt.p).toFixed(1)}" r="3.5" fill="${s.color}"/>`;
+  }
+  const latest=series[0].h[series[0].h.length-1];
+  out+=`<text x="${pad}" y="16" fill="var(--muted)" font-size="12">สูงสุด ${fmt(max)} ฿ · ล่าสุด ${fmt(latest.p)} ฿</text>
+        <text x="${pad}" y="${H-8}" fill="var(--muted)" font-size="12">ต่ำสุด ${fmt(min)} ฿ · ${d0} → ${d1}</text>`;
   svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
-  svg.innerHTML=`
-    <polygon points="${pad},${H-pad} ${pts} ${X(h.length-1)},${H-pad}" fill="var(--gold)" opacity="0.08"/>
-    <polyline points="${pts}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round"/>
-    <circle cx="${X(h.length-1)}" cy="${Y(h[h.length-1].p)}" r="3.5" fill="var(--gold)"/>
-    <text x="${pad}" y="16" fill="var(--muted)" font-size="12">${fmt(max)} ฿</text>
-    <text x="${pad}" y="${H-8}" fill="var(--muted)" font-size="12">${fmt(min)} ฿ · ${h[0].d} → ${h[h.length-1].d}</text>`;
+  svg.innerHTML=out;
 }
+document.querySelectorAll("#rangeBtns button").forEach(b=>{
+  b.onclick=async()=>{
+    chartDays=parseInt(b.dataset.days,10);
+    try{localStorage.setItem("tg-days",String(chartDays));}catch(e){}
+    document.querySelectorAll("#rangeBtns button").forEach(x=>x.classList.toggle("active",x===b));
+    drawChart(); // แสดงข้อมูลเดิมก่อนระหว่างโหลด
+    await loadPaxg(chartDays);
+    drawChart();
+  };
+});
+document.querySelectorAll("#rangeBtns button").forEach(x=>x.classList.toggle("active",parseInt(x.dataset.days,10)===chartDays));
 let rz;window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(drawChart,150);});
 
+/* ---------- diamond estimator ---------- */
+// ราคาฐาน: เพชรกลมธรรมชาติ 1.00 ct, G, VS1, Cut Excellent (ตลาดค้าปลีก 2025–26 ≈ US$5,500–8,500/ct)
+const DIA_BASE_DEFAULT=230000; // ฿/กะรัต
+// ตัวคูณราคา/กะรัต ตามช่วงน้ำหนัก (ราคาต่อกะรัตสูงขึ้นตามขนาด ไม่เป็นเส้นตรง)
+const DIA_SIZE=[[0.30,0.34],[0.50,0.48],[0.70,0.62],[0.90,0.80],[1.00,1.00],[1.25,1.15],[1.50,1.38],[2.00,1.85],[3.00,2.60],[5.00,3.60],[10.00,5.00]];
+const DIA_COLOR={D:1.45,E:1.32,F:1.20,G:1.00,H:0.88,I:0.76,J:0.66,K:0.55,L:0.47,M:0.40};
+const DIA_CLAR={FL:1.70,IF:1.50,VVS1:1.32,VVS2:1.20,VS1:1.00,VS2:0.92,SI1:0.80,SI2:0.68,I1:0.45};
+const DIA_CUT={EX:1.00,VG:0.92,G:0.82,F:0.70};
+// รูปทรงแฟนซีถูกกว่าเพชรกลม (เศษเพชรเหลือน้อยกว่าเวลาเจียระไน + อุปสงค์)
+const DIA_SHAPE={round:1.00,princess:0.78,oval:0.85,emerald:0.78,pear:0.80,marquise:0.78,cushion:0.75,heart:0.80,radiant:0.76,asscher:0.76};
+const DIA_SHAPE_TH={round:"กลม",princess:"พรินเซส",oval:"รี",emerald:"เอเมอรัลด์",pear:"หยดน้ำ",marquise:"มาร์คีส์",cushion:"คุชชั่น",heart:"หัวใจ",radiant:"เรเดียนท์",asscher:"แอสเชอร์"};
+
+function sizeMult(ct){
+  const t=DIA_SIZE;
+  if(ct<=t[0][0]) return t[0][1]*(ct/t[0][0]); // เม็ดจิ๋ว: สเกลลงตามน้ำหนัก
+  for(let i=1;i<t.length;i++){
+    if(ct<=t[i][0]){
+      const [a,ma]=t[i-1],[b,mb]=t[i];
+      return ma+(mb-ma)*(ct-a)/(b-a); // interpolate เชิงเส้นระหว่างจุด
+    }
+  }
+  return t[t.length-1][1];
+}
+function loadDiaBase(){
+  const v=num(localStorage.getItem("tg-diabase"));
+  return v>0?v:DIA_BASE_DEFAULT;
+}
+$("#dBase").value=loadDiaBase();
+$("#dReset").onclick=()=>{$("#dBase").value=DIA_BASE_DEFAULT;try{localStorage.removeItem("tg-diabase");}catch(e){}calcDia();};
+
+function calcDia(){
+  const ct=Math.min(10,inputNum("#dCarat"));
+  const base=inputNum("#dBase")||DIA_BASE_DEFAULT;
+  try{if(inputNum("#dBase")>0)localStorage.setItem("tg-diabase",String(inputNum("#dBase")));}catch(e){}
+  const shape=$("#dShape").value, color=$("#dColor").value, clar=$("#dClarity").value, cut=$("#dCut").value;
+  const el=$("#diaResult");
+  if(!(ct>0)){el.innerHTML=`<div class="warn">กรุณากรอกน้ำหนักกะรัตมากกว่า 0</div>`;return;}
+  const perCt=base*sizeMult(ct)*(DIA_COLOR[color]||1)*(DIA_CLAR[clar]||1)*(DIA_CUT[cut]||1)*(DIA_SHAPE[shape]||1);
+  const mid=perCt*ct;
+  if(!Number.isFinite(mid)||mid<=0){el.innerHTML=`<div class="warn">คำนวณไม่ได้ — ตรวจสอบราคาฐาน</div>`;return;}
+  const lo=mid*0.85, hi=mid*1.15;
+  el.innerHTML=`
+    <div class="line"><span>สเปก</span><span>${DIA_SHAPE_TH[shape]||shape} ${fmt(ct,2)} ct · ${color} · ${clar} · ${$("#dCut").selectedOptions[0].text}</span></div>
+    <div class="line"><span>ราคาประมาณต่อกะรัต</span><span>${fmt(perCt)} ฿/ct</span></div>
+    <div class="total"><span>ช่วงราคาโดยประมาณ</span><span>${fmt(lo)} – ${fmt(hi)} ฿</span></div>
+    <div class="line" style="margin-top:6px"><span>ค่ากลาง</span><span>${fmt(mid)} ฿</span></div>`;
+}
+document.querySelectorAll("#dCarat,#dShape,#dColor,#dClarity,#dCut,#dBase").forEach(el=>el.addEventListener("input",calcDia));
+calcDia();
+
+/* ---------- init ---------- */
 fetchPrice();
+loadPaxg(chartDays).then(drawChart);
 </script>
 </body>
 </html>
