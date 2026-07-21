@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ราคาทองคำแท่ง–รูปพรรณวันนี้ อ้างอิงสมาคมค้าทองคำ พร้อมเครื่องคำนวณราคาเครื่องประดับและประเมินราคารับซื้อคืน">
+<title>Thai Gold Dashboard — ราคาทองวันนี้ + คำนวณราคาเครื่องประดับ</title>
+<style>
+:root{
+  --bg:#0c0e12; --panel:#14171d; --panel2:#1b1f27; --border:#272c37;
+  --text:#e8eaf0; --muted:#8a93a5; --gold:#e6b64c; --gold2:#f5d27a;
+  --up:#3ecf8e; --down:#ff5c72; --radius:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.3);
+}
+:root[data-theme="light"]{
+  --bg:#f5f6f9; --panel:#ffffff; --panel2:#eef0f5; --border:#dde1e9;
+  --text:#1a1f2b; --muted:#61697a; --gold:#b8860b; --gold2:#96700a;
+  --shadow:0 1px 3px rgba(30,40,60,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif;min-height:100vh}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--panel);position:sticky;top:0;z-index:5}
+.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#e6b64c,#b8860b);display:grid;place-items:center;font-size:20px;flex:none}
+header h1{font-size:17px;font-weight:600;line-height:1.3}
+header .sub{font-size:12px;color:var(--muted)}
+.spacer{flex:1}
+button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:8px 16px;cursor:pointer;transition:border-color .15s,transform .1s;min-height:40px}
+button:hover{border-color:var(--gold)}
+button:active{transform:scale(.97)}
+button.gold{background:linear-gradient(135deg,#e6b64c,#c99a2e);border:none;color:#1a1405;font-weight:700}
+button:disabled{opacity:.55;cursor:wait}
+main{max-width:1200px;margin:0 auto;padding:18px 16px 24px;display:grid;gap:18px}
+@media(min-width:700px){main{padding:24px 26px}}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:700px){.cards{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+.card .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.card .value{font-size:clamp(22px,5.5vw,30px);font-weight:700;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.card .value small{font-size:13px;color:var(--muted);font-weight:400}
+.card.hero{background:linear-gradient(135deg,rgba(230,182,76,.14),transparent);border-color:rgba(230,182,76,.45)}
+.card.hero .value{color:var(--gold2)}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;border-radius:20px;padding:3px 11px;border:1px solid var(--border);white-space:nowrap}
+.badge.live{color:var(--up);border-color:var(--up)}
+.badge.manual{color:var(--down);border-color:var(--down)}
+.badge.cache{color:var(--gold);border-color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:860px){.grid2{grid-template-columns:1fr 1fr;gap:20px}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.panel h2{font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.field{margin-bottom:14px;min-width:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+input,select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:10px 12px;font:inherit;min-height:42px}
+input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(230,182,76,.15)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 130px}
+.result{background:var(--panel2);border-radius:11px;padding:16px;margin-top:6px}
+.result .line{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:14px;font-variant-numeric:tabular-nums}
+.result .line span:first-child{color:var(--muted)}
+.result .total{border-top:1px solid var(--border);margin-top:8px;padding-top:10px;font-size:20px;font-weight:700;display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
+.result .total span:last-child{color:var(--gold2)}
+.result .warn{color:var(--down);font-size:13px;padding:4px 0}
+#chart{width:100%;height:180px;display:block}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 16px;border-top:1px solid var(--border);margin-top:10px}
+footer a{color:var(--gold)}
+.manual-box{display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.errbar{display:none;background:rgba(255,92,114,.1);border:1px solid rgba(255,92,114,.4);color:var(--down);border-radius:11px;padding:10px 16px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🪙</div>
+  <div>
+    <h1>Thai Gold Dashboard</h1>
+    <div class="sub">ราคาทองคำแท่ง–รูปพรรณ อ้างอิงสมาคมค้าทองคำ + เครื่องคำนวณราคาเครื่องประดับ</div>
+  </div>
+  <div class="spacer"></div>
+  <span class="badge" id="srcBadge">…</span>
+  <button id="btnTheme" aria-label="สลับธีมสว่าง/มืด" title="สลับธีม">🌓</button>
+  <button class="gold" id="btnRefresh">⟳ อัปเดตราคา</button>
+</header>
+
+<main>
+  <div class="errbar" id="errBar"></div>
+
+  <div class="cards">
+    <div class="card hero">
+      <div class="label">ทองแท่ง 96.5% — ขายออก</div>
+      <div class="value" id="barSell">—<small> ฿/บาททอง</small></div>
+      <div class="meta" id="updated">รอข้อมูล…</div>
+    </div>
+    <div class="card">
+      <div class="label">ทองแท่ง — รับซื้อ</div>
+      <div class="value" id="barBuy">—<small> ฿/บาททอง</small></div>
+    </div>
+    <div class="card">
+      <div class="label">ทองรูปพรรณ — ขายออก</div>
+      <div class="value" id="ornSell">—<small> ฿/บาททอง</small></div>
+    </div>
+    <div class="card">
+      <div class="label">ทองรูปพรรณ — รับซื้อ</div>
+      <div class="value" id="ornBuy">—<small> ฿/บาททอง</small></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📈 ราคาที่บันทึกไว้ (จากการเปิดใช้แต่ละครั้ง)</h2>
+    <svg id="chart" preserveAspectRatio="none" role="img" aria-label="กราฟราคาทองแท่งขายออกย้อนหลัง"></svg>
+    <div class="hint">กราฟสะสมจากราคาทองแท่งขายออกทุกครั้งที่เปิดหน้านี้ — เก็บในเครื่องคุณเท่านั้น (localStorage)</div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>💍 คำนวณราคาขายเครื่องประดับ</h2>
+      <div class="row">
+        <div class="field">
+          <label for="w">น้ำหนักทอง</label>
+          <input type="number" id="w" value="1" min="0" step="0.01" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="unit">หน่วย</label>
+          <select id="unit">
+            <option value="baht">บาททอง (รูปพรรณ = 15.16 g)</option>
+            <option value="salung">สลึง (¼ บาททอง)</option>
+            <option value="gram">กรัม</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="labor">ค่ากำเหน็จ (฿/ชิ้น)</label>
+          <input type="number" id="labor" value="500" min="0" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="qty">จำนวน (ชิ้น)</label>
+          <input type="number" id="qty" value="1" min="1" step="1" inputmode="numeric">
+        </div>
+      </div>
+      <div class="result" id="sellResult"></div>
+    </div>
+
+    <div class="panel">
+      <h2>💰 ประเมินราคารับซื้อคืน (ขายทองเก่า)</h2>
+      <div class="row">
+        <div class="field">
+          <label for="bw">น้ำหนักทอง</label>
+          <input type="number" id="bw" value="1" min="0" step="0.01" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="bunit">หน่วย</label>
+          <select id="bunit">
+            <option value="baht">บาททอง</option>
+            <option value="salung">สลึง</option>
+            <option value="gram">กรัม</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="btype">ประเภท</label>
+        <select id="btype">
+          <option value="orn">ทองรูปพรรณ (15.16 g/บาททอง)</option>
+          <option value="bar">ทองแท่ง (15.244 g/บาททอง)</option>
+        </select>
+      </div>
+      <div class="result" id="buyResult"></div>
+
+      <div class="manual-box" id="manualBox">
+        <div class="hint" style="margin-bottom:8px">⚠️ ดึงราคาอัตโนมัติไม่ได้ — กรอกราคาจาก <a href="https://www.goldtraders.or.th" target="_blank" rel="noopener" style="color:var(--gold)">goldtraders.or.th</a> เอง:</div>
+        <div class="row">
+          <div class="field"><label for="mBarSell">แท่ง ขายออก</label><input type="number" id="mBarSell" min="0" inputmode="numeric" placeholder="เช่น 42500"></div>
+          <div class="field"><label for="mBarBuy">แท่ง รับซื้อ</label><input type="number" id="mBarBuy" min="0" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="mOrnSell">รูปพรรณ ขายออก</label><input type="number" id="mOrnSell" min="0" inputmode="numeric"></div>
+          <div class="field"><label for="mOrnBuy">รูปพรรณ รับซื้อ</label><input type="number" id="mOrnBuy" min="0" inputmode="numeric"></div>
+        </div>
+        <button id="btnManual">ใช้ราคานี้</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  ข้อมูลราคาอ้างอิงจาก <a href="https://www.goldtraders.or.th" target="_blank" rel="noopener">สมาคมค้าทองคำ (Gold Traders Association)</a>
+  ผ่าน <a href="https://www.huasengheng.com" target="_blank" rel="noopener">Hua Seng Heng</a> / <a href="https://github.com/pnx/thai-gold-api" target="_blank" rel="noopener">thai-gold-api</a> ·
+  เพื่อการอ้างอิงเท่านั้น ราคาซื้อขายจริงขึ้นกับร้านค้า · MIT License
+</footer>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const API_HSH="https://apicheckprice.huasengheng.com/api/values/getprice/"; // REF = ราคาอ้างอิงสมาคมฯ, JEWEL = รูปพรรณ
+const API_GTA="https://api.chnwt.dev/thai-gold-api/latest";                 // fallback
+// น้ำหนักมาตรฐาน: ทองแท่ง 1 บาททอง = 15.244 g, ทองรูปพรรณ 1 บาททอง = 15.16 g
+const G_BAR=15.244, G_ORN=15.16;
+let P={barSell:0,barBuy:0,ornSell:0,ornBuy:0,when:""};
+
+const root=document.documentElement;
+root.dataset.theme=localStorage.getItem("tg-theme")||"dark";
+$("#btnTheme").onclick=()=>{root.dataset.theme=root.dataset.theme==="dark"?"light":"dark";try{localStorage.setItem("tg-theme",root.dataset.theme);}catch(e){}};
+
+// fmt: "—" เฉพาะค่าที่ไม่ใช่ตัวเลข; 0 แสดงเป็น 0 (ไม่ใช่ "—")
+const fmt=(n,d=0)=>Number.isFinite(n)?n.toLocaleString("th-TH",{minimumFractionDigits:0,maximumFractionDigits:d}):"—";
+const fmtPrice=n=>Number.isFinite(n)&&n>0?fmt(n):"—";
+const num=s=>{const v=parseFloat(String(s??"").replace(/,/g,""));return Number.isFinite(v)?v:0;};
+// อ่านค่าจาก input: กัน NaN และค่าติดลบ
+const inputNum=id=>Math.max(0,num($(id).value));
+
+function setBadge(text,cls){const b=$("#srcBadge");b.textContent=text;b.className="badge"+(cls?" "+cls:"");}
+function showError(msg){const e=$("#errBar");if(msg){e.textContent=msg;e.style.display="block";}else e.style.display="none";}
+function saveLast(){try{localStorage.setItem("tg-last",JSON.stringify(P));}catch(e){}}
+function loadLast(){try{return JSON.parse(localStorage.getItem("tg-last")||"null");}catch(e){return null;}}
+
+function render(){
+  $("#barSell").innerHTML=fmtPrice(P.barSell)+"<small> ฿/บาททอง</small>";
+  $("#barBuy").innerHTML=fmtPrice(P.barBuy)+"<small> ฿/บาททอง</small>";
+  $("#ornSell").innerHTML=fmtPrice(P.ornSell)+"<small> ฿/บาททอง</small>";
+  $("#ornBuy").innerHTML=fmtPrice(P.ornBuy)+"<small> ฿/บาททอง</small>";
+  $("#updated").textContent=P.when||"";
+  calc(); drawChart();
+}
+
+async function fetchJSON(url,timeoutMs=8000){
+  const ctl=new AbortController();
+  const t=setTimeout(()=>ctl.abort(),timeoutMs);
+  try{
+    const r=await fetch(url,{cache:"no-store",signal:ctl.signal});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return await r.json();
+  }finally{clearTimeout(t);}
+}
+
+async function fromHSH(){
+  const arr=await fetchJSON(API_HSH);
+  if(!Array.isArray(arr)) throw new Error("bad payload");
+  const ref=arr.find(x=>x&&x.GoldType==="REF"), jw=arr.find(x=>x&&x.GoldType==="JEWEL");
+  if(!ref||num(ref.Sell)<=0) throw new Error("empty");
+  return {
+    barSell:num(ref.Sell), barBuy:num(ref.Buy),
+    ornSell:num(jw&&jw.Sell), ornBuy:num(jw&&jw.Buy),
+    when:(ref.StrTimeUpdate||"")+" · ราคาอ้างอิงสมาคมฯ ผ่าน Hua Seng Heng"
+  };
+}
+async function fromGTA(){
+  const j=await fetchJSON(API_GTA);
+  const p=j&&j.response&&j.response.price;
+  if(!p||!p.gold_bar||!p.gold) throw new Error("bad payload");
+  const out={
+    barSell:num(p.gold_bar.sell), barBuy:num(p.gold_bar.buy),
+    ornSell:num(p.gold.sell),     ornBuy:num(p.gold.buy),
+    when:`อัปเดต ${j.response.update_date||""} ${j.response.update_time||""} (สมาคมค้าทองคำ)`.trim()
+  };
+  if(out.barSell<=0) throw new Error("empty");
+  return out;
+}
+
+let fetching=false;
+async function fetchPrice(){
+  if(fetching) return;
+  fetching=true; $("#btnRefresh").disabled=true;
+  setBadge("กำลังโหลด…"); showError(null);
+  try{
+    try{ P=await fromHSH(); }
+    catch(e1){ P=await fromGTA(); }
+    setBadge("● LIVE","live");
+    $("#manualBox").style.display="none";
+    if(P.barSell>0) saveHistory(P.barSell);
+    saveLast(); // บันทึกเฉพาะราคาที่ดึงสำเร็จ ไม่เขียนทับด้วยค่าว่าง/ป้ายซ้ำ
+  }catch(e){
+    const offline=(typeof navigator!=="undefined"&&navigator.onLine===false);
+    const cached=loadLast();
+    if(cached&&cached.barSell>0){
+      P=cached;
+      setBadge("ราคาแคชล่าสุด","cache");
+      showError((offline?"ออฟไลน์อยู่ — ":"เชื่อมต่อแหล่งราคาไม่ได้ — ")+"กำลังแสดงราคาล่าสุดที่บันทึกไว้ ("+(P.when||"ไม่ทราบเวลา")+") หรือกรอกราคาเองด้านล่าง");
+    }else{
+      setBadge("ป้อนราคาเอง","manual");
+      showError(offline?"ออฟไลน์อยู่และยังไม่มีราคาที่บันทึกไว้ — กรอกราคาจากเว็บสมาคมค้าทองคำในช่องด้านล่าง":"ดึงราคาอัตโนมัติไม่ได้ — กรอกราคาจากเว็บสมาคมค้าทองคำในช่องด้านล่าง");
+    }
+    $("#manualBox").style.display="block";
+  }finally{
+    fetching=false; $("#btnRefresh").disabled=false;
+  }
+  render();
+}
+
+$("#btnManual").onclick=()=>{
+  const m={barSell:inputNum("#mBarSell"),barBuy:inputNum("#mBarBuy"),
+           ornSell:inputNum("#mOrnSell"),ornBuy:inputNum("#mOrnBuy")};
+  if(m.barSell<=0&&m.ornSell<=0){showError("กรุณากรอกราคาขายออกอย่างน้อยหนึ่งค่า");return;}
+  P={...m,when:"ราคาที่ป้อนเอง "+new Date().toLocaleString("th-TH")};
+  setBadge("ราคาที่ป้อนเอง","manual"); showError(null);
+  saveLast();
+  if(P.barSell>0) saveHistory(P.barSell);
+  render();
+};
+$("#btnRefresh").onclick=fetchPrice;
+window.addEventListener("online",fetchPrice);
+
+/* ---------- calculators ---------- */
+function toBaht(w,unit,gramsPerBaht){
+  if(unit==="baht") return w;
+  if(unit==="salung") return w/4;   // 1 บาททอง = 4 สลึง
+  return w/gramsPerBaht;            // กรัม → บาททอง
+}
+function calc(){
+  // ขาย: ราคารูปพรรณขายออก × น้ำหนัก (บาททอง) + ค่ากำเหน็จ ต่อชิ้น × จำนวน
+  const wB=toBaht(inputNum("#w"),$("#unit").value,G_ORN);
+  const labor=inputNum("#labor");
+  const qty=Math.max(1,Math.floor(num($("#qty").value))||1);
+  const hasOrnSell=P.ornSell>0;
+  const goldVal=hasOrnSell?P.ornSell*wB:NaN;
+  const perPiece=hasOrnSell?goldVal+labor:NaN;
+  $("#sellResult").innerHTML=`
+    ${hasOrnSell?"":`<div class="warn">ยังไม่มีราคารูปพรรณ — กดอัปเดตราคาหรือกรอกราคาเองก่อน</div>`}
+    <div class="line"><span>มูลค่าเนื้อทอง (${fmt(wB,4)} บาททอง)</span><span>${fmt(goldVal)} ฿</span></div>
+    <div class="line"><span>ค่ากำเหน็จ</span><span>${fmt(labor)} ฿</span></div>
+    <div class="line"><span>ราคาต่อชิ้น</span><span>${fmt(perPiece)} ฿</span></div>
+    <div class="total"><span>รวม ${fmt(qty)} ชิ้น</span><span>${fmt(perPiece*qty)} ฿</span></div>`;
+
+  // รับซื้อคืน
+  const isBar=$("#btype").value==="bar";
+  const wB2=toBaht(inputNum("#bw"),$("#bunit").value,isBar?G_BAR:G_ORN);
+  const rate=isBar?P.barBuy:P.ornBuy;
+  const hasRate=rate>0;
+  $("#buyResult").innerHTML=`
+    ${hasRate?"":`<div class="warn">ยังไม่มีราคารับซื้อ — กดอัปเดตราคาหรือกรอกราคาเองก่อน</div>`}
+    <div class="line"><span>ราคารับซื้อ${isBar?"ทองแท่ง":"รูปพรรณ"}/บาททอง</span><span>${fmtPrice(rate)} ฿</span></div>
+    <div class="line"><span>น้ำหนัก</span><span>${fmt(wB2,4)} บาททอง</span></div>
+    <div class="total"><span>ประเมินได้รับ</span><span>${hasRate?fmt(rate*wB2):"—"} ฿</span></div>`;
+}
+document.querySelectorAll("#w,#unit,#labor,#qty,#bw,#bunit,#btype").forEach(el=>el.addEventListener("input",calc));
+
+/* ---------- history sparkline ---------- */
+function loadHist(){try{const h=JSON.parse(localStorage.getItem("tg-hist")||"[]");return Array.isArray(h)?h.filter(x=>x&&Number.isFinite(x.p)&&x.p>0):[];}catch(e){return [];}}
+function saveHistory(price){
+  if(!Number.isFinite(price)||price<=0) return;
+  const h=loadHist();
+  const today=new Date().toISOString().slice(0,10);
+  const last=h[h.length-1];
+  if(last&&last.d===today) last.p=price; else h.push({d:today,p:price});
+  try{localStorage.setItem("tg-hist",JSON.stringify(h.slice(-60)));}catch(e){}
+}
+function drawChart(){
+  const h=loadHist();
+  const svg=$("#chart");
+  if(h.length<2){ svg.removeAttribute("viewBox"); svg.innerHTML=`<text x="10" y="30" fill="var(--muted)" font-size="13">เปิดหน้านี้หลายๆ วัน กราฟจะค่อยๆ สะสมข้อมูลเอง (ตอนนี้มี ${h.length} จุด)</text>`; return; }
+  const W=svg.clientWidth||800, H=180, pad=28;
+  const ps=h.map(x=>x.p), min=Math.min(...ps), max=Math.max(...ps), rng=(max-min)||1;
+  const X=i=>pad+i*(W-pad*2)/(h.length-1);
+  const Y=p=>H-pad-(p-min)/rng*(H-pad*2);
+  const pts=h.map((x,i)=>`${X(i)},${Y(x.p)}`).join(" ");
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  svg.innerHTML=`
+    <polygon points="${pad},${H-pad} ${pts} ${X(h.length-1)},${H-pad}" fill="var(--gold)" opacity="0.08"/>
+    <polyline points="${pts}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="${X(h.length-1)}" cy="${Y(h[h.length-1].p)}" r="3.5" fill="var(--gold)"/>
+    <text x="${pad}" y="16" fill="var(--muted)" font-size="12">${fmt(max)} ฿</text>
+    <text x="${pad}" y="${H-8}" fill="var(--muted)" font-size="12">${fmt(min)} ฿ · ${h[0].d} → ${h[h.length-1].d}</text>`;
+}
+let rz;window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(drawChart,150);});
+
+fetchPrice();
+</script>
+</body>
+</html>
