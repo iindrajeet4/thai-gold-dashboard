@@ -64,3 +64,12 @@ MIT — see [LICENSE](LICENSE)
 - Historical chart: PAX Gold (PAXG) prices via the free [CoinGecko API](https://www.coingecko.com/en/api)
 - Diamond baseline ranges: compiled from public 2025–26 retail market guides (e.g. diamonds.pro, StoneAlgo) — approximate, user-calibratable
 - UI direction inspired by [Tremor](https://github.com/tremorlabs/tremor) dashboard aesthetics (independent vanilla-JS implementation, no code reused)
+
+---
+
+## 💼 Services & custom work
+
+I take on freelance and contract work around this project — custom implementation,
+new features, and integration with your stack.
+
+**Contact:** [GitHub @iindrajeet4](https://github.com/iindrajeet4) (opening an issue on this repo works too) · [DubeGames](https://dubegames.indrajeetdubeyy.workers.dev/)
